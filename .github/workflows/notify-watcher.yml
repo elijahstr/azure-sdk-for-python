@@ -13,6 +13,6 @@ jobs:
         run: |
           curl -X POST \
             -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.SDK_REPO_PAT }}" \
-            https://api.github.com/repos/elijahstr/watcher-repo/dispatches \
+            -H "Authorization: Bearer ${{ secrets.SDK_REPO_PAT }}" \
+            https://api.github.com/repos/mayaealexander/watcher-repo/dispatches \
             -d '{"event_type": "sdk-updated", "client_payload": {"sdk": "python"}}'
