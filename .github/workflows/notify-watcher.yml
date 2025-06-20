@@ -1,0 +1,33 @@
+name: Notify Watcher
+
+on:
+  push:
+    paths:
+      - 'sdk/ai/azure-ai-agents/samples/**'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 #get full history so git diff works
+          ref: main #ensures origin/main is available
+          
+      - name: Get updated .py files in samples/
+        id: changes
+        run: |
+          git fetch --no-tags --prune --depth=2 origin main
+          CHANGED=$(git diff --name-only HEAD^ HEAD | grep 'sdk/ai/azure-ai-agents/samples/' | grep '\.py$' || true)
+          UPDATED_CSV=$(echo "$CHANGED" | paste -sd "," -)
+          echo "updated_files=$UPDATED_CSV" >> $GITHUB_OUTPUT
+
+          
+      - name: Trigger Watcher repo workflow
+        run: |
+          curl -X POST https://api.github.com/repos/mayaealexander/watcher-repo/dispatches \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.SDK_REPO_PAT }}" \
+            -d '{"event_type": "sdk-updated", "client_payload": {"updated_files": "${{ steps.changes.outputs.updated_files }}"}}'
