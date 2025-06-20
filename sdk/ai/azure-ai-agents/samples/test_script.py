@@ -4,6 +4,9 @@ def sample_add(a, b):\
 def test_add():
   assert sample_add(2,3) == 5
 
+def test_fail_add():
+  assert sample_add(3,6) == 8
+
 #testing trigger (with pytest)
 #test 2
 # test 3 please work
