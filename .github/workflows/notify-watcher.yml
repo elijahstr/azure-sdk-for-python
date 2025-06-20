@@ -19,10 +19,11 @@ jobs:
       - name: Get updated .py files in samples/
         id: changes
         run: |
-          git fetch origin main
-          CHANGED=$(git diff --name-only origin/main...HEAD | grep 'sdk/ai/azure-ai-agents/samples/' | grep '\.py$' || true)
+          git fetch --no-tags --prune --depth=2 origin main
+          CHANGED=$(git diff --name-only HEAD^ HEAD | grep 'sdk/ai/azure-ai-agents/samples/' | grep '\.py$' || true)
           UPDATED_CSV=$(echo "$CHANGED" | paste -sd "," -)
           echo "updated_files=$UPDATED_CSV" >> $GITHUB_OUTPUT
+
           
       - name: Trigger Watcher repo workflow
         run: |
